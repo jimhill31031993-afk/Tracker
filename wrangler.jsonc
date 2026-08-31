@@ -1,0 +1,19 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
+  "name": "tracker",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-01",
+
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "site_control_db",
+      "database_id": "3bad9dad-4bf8-4e98-acd8-c2e3711359bc"
+    }
+  ]
+}
