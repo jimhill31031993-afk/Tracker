@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register — Site Control</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-body">
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-mark">SC</div>
+    <h1>Create your account</h1>
+    <p class="auth-sub">Site Control — project timeline tracker</p>
+
+    <div id="authError" class="auth-error" style="display:none;"></div>
+
+    <form id="registerForm">
+      <label>Email
+        <input type="email" id="fEmail" required autocomplete="email">
+      </label>
+      <label>Password
+        <input type="password" id="fPassword" required autocomplete="new-password" minlength="8">
+      </label>
+      <label>Confirm password
+        <input type="password" id="fPassword2" required autocomplete="new-password" minlength="8">
+      </label>
+      <button type="submit" class="btn btn-primary btn-block">Register</button>
+    </form>
+
+    <p class="auth-switch">Already have an account? <a href="login.html">Sign in</a></p>
+  </div>
+</div>
+
+<footer id="footerRoot" class="site-footer"></footer>
+
+<script src="common.js"></script>
+<script>
+  document.getElementById("footerRoot").innerHTML = `<p>© Ravithra Alahakoon ${new Date().getFullYear()}</p>`;
+
+  document.getElementById("registerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errEl = document.getElementById("authError");
+    errEl.style.display = "none";
+
+    const pw = document.getElementById("fPassword").value;
+    const pw2 = document.getElementById("fPassword2").value;
+    if (pw !== pw2) {
+      errEl.textContent = "Passwords don't match";
+      errEl.style.display = "block";
+      return;
+    }
+
+    try {
+      await apiPost("/api/register", {
+        email: document.getElementById("fEmail").value.trim(),
+        password: pw,
+      });
+      location.href = "index.html";
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.style.display = "block";
+    }
+  });
+</script>
+</body>
+</html>
