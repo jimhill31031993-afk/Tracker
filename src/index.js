@@ -2,6 +2,10 @@
 // One Worker script: auth (register/login/logout/me), the tracker's
 // row CRUD + close-to-completed flow, the completed list, analytics,
 // and serving the static site from ./public.
+//
+// The entire fetch handler is wrapped in one try/catch so nothing can
+// ever produce a raw Cloudflare "Worker threw exception" page again —
+// any failure comes back as readable JSON instead.
 
 const STAGE_DURATIONS = {
   "Not Selected": 0,
@@ -19,60 +23,72 @@ const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 export default {
   async fetch(request, env) {
-    const url = new URL(request.url);
-    const path = url.pathname;
-
     try {
-      if (path === "/api/register" && request.method === "POST") return handleRegister(request, env);
-      if (path === "/api/login" && request.method === "POST") return handleLogin(request, env);
-      if (path === "/api/logout" && request.method === "POST") return handleLogout(request, env);
-      if (path === "/api/me" && request.method === "GET") return handleMe(request, env);
+      if (!env.DB) {
+        return json({ error: "D1 binding 'DB' is missing on this Worker — check Settings > Bindings" }, 500);
+      }
+
+      const url = new URL(request.url);
+      const path = url.pathname;
+
+      if (path === "/api/register" && request.method === "POST") return await handleRegister(request, env);
+      if (path === "/api/login" && request.method === "POST") return await handleLogin(request, env);
+      if (path === "/api/logout" && request.method === "POST") return await handleLogout(request, env);
+      if (path === "/api/me" && request.method === "GET") return await handleMe(request, env);
 
       if (path === "/api/rows") {
         const user = await requireAuth(request, env);
         if (!user) return unauthorized();
-        if (request.method === "GET") return listActiveRows(user, env);
-        if (request.method === "POST") return createRow(user, request, env);
+        if (request.method === "GET") return await listActiveRows(user, env);
+        if (request.method === "POST") return await createRow(user, request, env);
       }
 
       let m = path.match(/^\/api\/rows\/([^/]+)\/close$/);
       if (m) {
         const user = await requireAuth(request, env);
         if (!user) return unauthorized();
-        if (request.method === "PATCH") return closeRow(user, m[1], request, env);
+        if (request.method === "PATCH") return await closeRow(user, m[1], request, env);
       }
 
       m = path.match(/^\/api\/rows\/([^/]+)$/);
       if (m) {
         const user = await requireAuth(request, env);
         if (!user) return unauthorized();
-        if (request.method === "PATCH") return updateRow(user, m[1], request, env);
-        if (request.method === "DELETE") return deleteRow(user, m[1], env);
+        if (request.method === "PATCH") return await updateRow(user, m[1], request, env);
+        if (request.method === "DELETE") return await deleteRow(user, m[1], env);
       }
 
       if (path === "/api/completed" && request.method === "GET") {
         const user = await requireAuth(request, env);
         if (!user) return unauthorized();
-        return listCompletedRows(user, env);
+        return await listCompletedRows(user, env);
       }
 
       m = path.match(/^\/api\/completed\/([^/]+)$/);
       if (m && request.method === "PATCH") {
         const user = await requireAuth(request, env);
         if (!user) return unauthorized();
-        return updateCompletedValue(user, m[1], request, env);
+        return await updateCompletedValue(user, m[1], request, env);
       }
 
       if (path === "/api/analytics" && request.method === "GET") {
         const user = await requireAuth(request, env);
         if (!user) return unauthorized();
-        return getAnalytics(user, url, env);
+        return await getAnalytics(user, url, env);
       }
-    } catch (err) {
-      return json({ error: "Server error: " + err.message }, 500);
-    }
 
-    return env.ASSETS.fetch(request);
+      return await env.ASSETS.fetch(request);
+    } catch (err) {
+      // TEMPORARY: includes the real message + stack so we can pinpoint
+      // the fault. Safe to leave during setup; consider trimming later.
+      return json(
+        {
+          error: "Server error: " + (err && err.message ? err.message : String(err)),
+          stack: err && err.stack ? String(err.stack) : null,
+        },
+        500
+      );
+    }
   },
 };
 
@@ -98,7 +114,7 @@ async function handleRegister(request, env) {
     .bind(id, email, hash, salt, now)
     .run();
 
-  return startSession(id, email, env);
+  return await startSession(id, email, env);
 }
 
 async function handleLogin(request, env) {
@@ -112,7 +128,7 @@ async function handleLogin(request, env) {
   const ok = await verifyPassword(password, user.salt, user.password_hash);
   if (!ok) return json({ error: "Invalid email or password" }, 401);
 
-  return startSession(user.id, user.email, env);
+  return await startSession(user.id, user.email, env);
 }
 
 async function handleLogout(request, env) {
@@ -144,7 +160,7 @@ async function startSession(userId, email, env) {
 }
 
 async function requireAuth(request, env) {
-  return getSessionUser(request, env);
+  return await getSessionUser(request, env);
 }
 
 async function getSessionUser(request, env) {
