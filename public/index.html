@@ -3,21 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Site Control — Project Timeline Tracker</title>
+<title>Tracker — Site Control</title>
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-page="tracker">
 
-<header class="topbar">
-  <div class="topbar-left">
-    <span class="topbar-mark">SC</span>
-    <div>
-      <h1>Site Control</h1>
-      <p class="topbar-sub">Project timeline tracker</p>
-    </div>
-  </div>
-  <button id="btnAddNew" class="btn btn-primary">+ Add new</button>
-</header>
+<header class="topbar" id="headerRoot"></header>
 
 <main>
   <div class="table-wrap">
@@ -37,12 +28,13 @@
           <th class="col-row-actions"></th>
         </tr>
       </thead>
-      <tbody id="rowsBody">
-      </tbody>
+      <tbody id="rowsBody"></tbody>
     </table>
-    <p id="emptyState" class="empty-state">No projects yet. Click <strong>+ Add new</strong> to log your first one.</p>
+    <p id="emptyState" class="empty-state">No active projects yet. Click <strong>+ Add new</strong> to log your first one.</p>
   </div>
 </main>
+
+<footer id="footerRoot" class="site-footer"></footer>
 
 <!-- ===================== ADD NEW MODAL ===================== -->
 <div id="modalAdd" class="modal-backdrop">
@@ -69,7 +61,6 @@
           <option value="Repricing">Repricing — 2 weekdays</option>
           <option value="ECI">ECI — 10 weekdays</option>
           <option value="Tender">Tender — 10 weekdays</option>
-          <option value="Submitted">Submitted</option>
         </select>
       </label>
       <label>Start date
@@ -109,7 +100,6 @@
           <option value="Repricing">Repricing — 2 weekdays</option>
           <option value="ECI">ECI — 10 weekdays</option>
           <option value="Tender">Tender — 10 weekdays</option>
-          <option value="Submitted">Submitted</option>
         </select>
       </label>
       <label>Start date
@@ -129,6 +119,27 @@
   </div>
 </div>
 
+<!-- ===================== CLOSE MODAL ===================== -->
+<div id="modalClose" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Close project</h2>
+      <button class="modal-close" data-close="modalClose">&times;</button>
+    </div>
+    <form id="formClose">
+      <input type="hidden" id="cId">
+      <p class="modal-note">Enter the final project value to close this out. It'll move to the Completed list and stop counting down.</p>
+      <label>Project value ($)
+        <input type="number" id="cValue" min="0" step="0.01" required placeholder="e.g. 45000">
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close="modalClose">Cancel</button>
+        <button type="submit" class="btn btn-primary">Submit &amp; close</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- ===================== HISTORY MODAL ===================== -->
 <div id="modalHistory" class="modal-backdrop">
   <div class="modal modal-wide">
@@ -140,6 +151,7 @@
   </div>
 </div>
 
-<script src="app.js"></script>
+<script src="common.js"></script>
+<script src="tracker.js"></script>
 </body>
 </html>
