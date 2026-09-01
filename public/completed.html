@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Completed — Site Control</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="completed">
+
+<header class="topbar" id="headerRoot"></header>
+
+<main>
+  <div class="table-wrap">
+    <table id="completedTable">
+      <thead>
+        <tr>
+          <th class="col-no">No</th>
+          <th class="col-address">Address</th>
+          <th class="col-wbs">WBS</th>
+          <th class="col-stage">Stage</th>
+          <th class="col-date">Start date</th>
+          <th class="col-date">Closed date</th>
+          <th class="col-status">On time</th>
+          <th class="col-value">Project value</th>
+        </tr>
+      </thead>
+      <tbody id="rowsBody"></tbody>
+    </table>
+    <p id="emptyState" class="empty-state">No completed projects yet — closed projects from the Tracker will appear here.</p>
+  </div>
+</main>
+
+<footer id="footerRoot" class="site-footer"></footer>
+
+<script src="common.js"></script>
+<script src="completed.js"></script>
+</body>
+</html>
