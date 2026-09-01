@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics — Site Control</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="analytics">
+
+<header class="topbar" id="headerRoot"></header>
+
+<main class="analytics-main">
+
+  <div class="analytics-controls">
+    <div class="segmented">
+      <button class="segmented-btn active" data-scope="month">Monthly</button>
+      <button class="segmented-btn" data-scope="year">Yearly</button>
+    </div>
+    <div class="period-nav">
+      <button id="btnPrev" class="icon-btn" title="Previous">‹</button>
+      <span id="periodLabel" class="period-label">—</span>
+      <button id="btnNext" class="icon-btn" title="Next">›</button>
+    </div>
+  </div>
+
+  <div class="analytics-headline">
+    <div class="headline-card">
+      <p class="headline-label">Total project value</p>
+      <p class="headline-number" id="numValue">$0</p>
+    </div>
+    <div class="headline-card">
+      <p class="headline-label">Met deadline</p>
+      <div class="ring-wrap">
+        <svg viewBox="0 0 120 120" class="ring-svg">
+          <circle cx="60" cy="60" r="52" class="ring-bg"></circle>
+          <circle cx="60" cy="60" r="52" class="ring-fg" id="ringFg"></circle>
+        </svg>
+        <span class="ring-number" id="numPercent">0%</span>
+      </div>
+    </div>
+    <div class="headline-card">
+      <p class="headline-label">Completed projects</p>
+      <p class="headline-number" id="numCount">0</p>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <p class="chart-title" id="chartTitle">Value by period</p>
+    <div class="bar-chart" id="barChart"></div>
+  </div>
+
+</main>
+
+<footer id="footerRoot" class="site-footer"></footer>
+
+<script src="common.js"></script>
+<script src="analytics.js"></script>
+</body>
+</html>
