@@ -15,6 +15,37 @@ const STAGE_DURATIONS = {
   "Tender": 10,
 };
 
+/* Pastel badge colours for the Stage pill shown in tables */
+const STAGE_COLORS = {
+  "Not Selected": { bg: "#EEF0F2", text: "#6B7480" },
+  "Indicative": { bg: "#FDECA8", text: "#8A6D00" },
+  "Detail Design": { bg: "#C7DBFB", text: "#1D4ED8" },
+  "Pricing": { bg: "#FBD9AE", text: "#9A5300" },
+  "Handover": { bg: "#BFEBDD", text: "#0F766E" },
+  "Redesign": { bg: "#DDE1E6", text: "#3F4750" },
+  "Repricing": { bg: "#DDE1E6", text: "#3F4750" },
+  "ECI": { bg: "#F7CFE3", text: "#A31A62" },
+  "Tender": { bg: "#DDD1F7", text: "#5B21B6" },
+};
+
+/* Slightly more saturated versions, used for the Analytics line chart
+   where a pastel line would be too faint to read against white. */
+const STAGE_LINE_COLORS = {
+  "Indicative": "#D4A017",
+  "Detail Design": "#2563EB",
+  "Pricing": "#EA8C00",
+  "Handover": "#0D9488",
+  "Redesign": "#6B7280",
+  "Repricing": "#9CA3AF",
+  "ECI": "#DB2777",
+  "Tender": "#7C3AED",
+};
+
+function stageBadge(stage) {
+  const c = STAGE_COLORS[stage] || STAGE_COLORS["Not Selected"];
+  return `<span class="stage-pill" style="background:${c.bg};color:${c.text};">${escapeHtml(stage)}</span>`;
+}
+
 /* ---------------------------------------------------------
    API helpers
    --------------------------------------------------------- */
