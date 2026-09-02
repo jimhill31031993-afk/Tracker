@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Analytics — Site Control</title>
+<link rel="icon" type="image/svg+xml" href="logo.svg">
 <link rel="stylesheet" href="style.css">
 </head>
 <body data-page="analytics">
@@ -45,26 +46,43 @@
     </div>
   </div>
 
-  <div class="chart-card">
-    <p class="chart-title" id="chartTitle">Value by period</p>
-    <div class="bar-chart" id="barChart"></div>
-  </div>
-
   <div class="chart-card stage-chart-card">
     <div class="stage-chart-head">
-      <p class="chart-title" style="margin:0;">Completion rate by stage</p>
+      <p class="chart-title" style="margin:0;">Tasks completed by stage</p>
       <div class="segmented">
-        <button class="segmented-btn range-btn" data-months="6">6mo</button>
-        <button class="segmented-btn range-btn active" data-months="12">12mo</button>
-        <button class="segmented-btn range-btn" data-months="24">24mo</button>
+        <button class="segmented-btn range-btn" data-chart="task" data-months="6">6mo</button>
+        <button class="segmented-btn range-btn active" data-chart="task" data-months="12">12mo</button>
+        <button class="segmented-btn range-btn" data-chart="task" data-months="24">24mo</button>
       </div>
     </div>
     <div class="stage-chart-body">
       <div class="stage-chart-svg-wrap">
-        <svg id="stageChartSvg" viewBox="0 0 900 320" class="stage-line-svg" preserveAspectRatio="xMinYMid meet"></svg>
+        <svg id="taskChartSvg" viewBox="0 0 900 320" class="stage-line-svg" preserveAspectRatio="xMinYMid meet"></svg>
       </div>
-      <div class="stage-toggles" id="stageToggles"></div>
+      <div class="stage-toggles" id="taskToggles"></div>
     </div>
+  </div>
+
+  <div class="chart-card stage-chart-card">
+    <div class="stage-chart-head">
+      <p class="chart-title" style="margin:0;">KPI — completion rate by stage</p>
+      <div class="segmented">
+        <button class="segmented-btn range-btn" data-chart="kpi" data-months="6">6mo</button>
+        <button class="segmented-btn range-btn active" data-chart="kpi" data-months="12">12mo</button>
+        <button class="segmented-btn range-btn" data-chart="kpi" data-months="24">24mo</button>
+      </div>
+    </div>
+    <div class="stage-chart-body">
+      <div class="stage-chart-svg-wrap">
+        <svg id="kpiChartSvg" viewBox="0 0 900 320" class="stage-line-svg" preserveAspectRatio="xMinYMid meet"></svg>
+      </div>
+      <div class="stage-toggles" id="kpiToggles"></div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <p class="chart-title" id="chartTitle">Value by period</p>
+    <div class="bar-chart" id="barChart"></div>
   </div>
 
 </main>
