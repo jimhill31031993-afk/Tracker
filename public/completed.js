@@ -41,7 +41,7 @@ function renderTable() {
       <td>${row.no}</td>
       <td><span class="cell-truncate" title="${escapeHtml(row.address)}">${escapeHtml(row.address)}</span></td>
       <td>${escapeHtml(row.wbs)}</td>
-      <td><span class="stage-pill">${escapeHtml(row.stage)}</span></td>
+      <td>${stageBadge(row.stage)}</td>
       <td class="mono">${row.startDate || "-"}</td>
       <td class="mono">${row.closedAt ? new Date(row.closedAt).toLocaleDateString() : "-"}</td>
       <td><span class="badge ${row.onTime ? "badge-good" : "badge-bad"}">${row.onTime ? "On time" : "Overdue"}</span></td>
