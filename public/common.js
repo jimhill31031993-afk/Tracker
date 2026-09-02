@@ -110,7 +110,7 @@ function initHeaderFooter(activePage, user) {
   if (headerRoot) {
     headerRoot.innerHTML = `
       <div class="topbar-left">
-        <span class="topbar-mark">SC</span>
+        <img class="topbar-mark" src="logo.svg" alt="Site Control">
         <div class="profile-block">
           <span class="profile-email">${escapeHtml(user?.email || "")}</span>
           <button id="btnSignOut" class="link-btn">Sign out</button>
