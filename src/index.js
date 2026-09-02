@@ -429,17 +429,29 @@ async function getStageAnalytics(user, url, env) {
   }
 
   const STAGES = ["Indicative", "Detail Design", "Pricing", "Handover", "Redesign", "Repricing", "ECI", "Tender"];
-  const series = STAGES.map((stage) => {
-    const stageMap = map[stage] || {};
-    const points = keys.map((k) => {
-      const e = stageMap[k];
-      if (!e || !e.cnt) return null;
-      return Math.round((e.ontime / e.cnt) * 100);
+
+  const pointFor = (stage, key) => {
+    const e = (map[stage] || {})[key];
+    if (!e || !e.cnt) return null;
+    return { cnt: e.cnt, ontime: e.ontime, pct: Math.round((e.ontime / e.cnt) * 100) };
+  };
+
+  const series = STAGES.map((stage) => ({
+    stage,
+    points: keys.map((k) => pointFor(stage, k)),
+  }));
+
+  const totalPoints = keys.map((k) => {
+    let cnt = 0, ontime = 0;
+    STAGES.forEach((stage) => {
+      const e = (map[stage] || {})[k];
+      if (e) { cnt += e.cnt; ontime += e.ontime; }
     });
-    return { stage, points };
+    if (!cnt) return null;
+    return { cnt, ontime, pct: Math.round((ontime / cnt) * 100) };
   });
 
-  return json({ months, labels, series });
+  return json({ months, labels, series, total: { points: totalPoints } });
 }
 
 /* ===========================================================
