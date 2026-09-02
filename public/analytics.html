@@ -50,6 +50,23 @@
     <div class="bar-chart" id="barChart"></div>
   </div>
 
+  <div class="chart-card stage-chart-card">
+    <div class="stage-chart-head">
+      <p class="chart-title" style="margin:0;">Completion rate by stage</p>
+      <div class="segmented">
+        <button class="segmented-btn range-btn" data-months="6">6mo</button>
+        <button class="segmented-btn range-btn active" data-months="12">12mo</button>
+        <button class="segmented-btn range-btn" data-months="24">24mo</button>
+      </div>
+    </div>
+    <div class="stage-chart-body">
+      <div class="stage-chart-svg-wrap">
+        <svg id="stageChartSvg" viewBox="0 0 900 320" class="stage-line-svg" preserveAspectRatio="xMinYMid meet"></svg>
+      </div>
+      <div class="stage-toggles" id="stageToggles"></div>
+    </div>
+  </div>
+
 </main>
 
 <footer id="footerRoot" class="site-footer"></footer>
