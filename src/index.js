@@ -2,10 +2,6 @@
 // One Worker script: auth (register/login/logout/me), the tracker's
 // row CRUD + close-to-completed flow, the completed list, analytics,
 // and serving the static site from ./public.
-//
-// The entire fetch handler is wrapped in one try/catch so nothing can
-// ever produce a raw Cloudflare "Worker threw exception" page again —
-// any failure comes back as readable JSON instead.
 
 const STAGE_DURATIONS = {
   "Not Selected": 0,
@@ -23,14 +19,10 @@ const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
+    const path = url.pathname;
+
     try {
-      if (!env.DB) {
-        return json({ error: "D1 binding 'DB' is missing on this Worker — check Settings > Bindings" }, 500);
-      }
-
-      const url = new URL(request.url);
-      const path = url.pathname;
-
       if (path === "/api/register" && request.method === "POST") return await handleRegister(request, env);
       if (path === "/api/login" && request.method === "POST") return await handleLogin(request, env);
       if (path === "/api/logout" && request.method === "POST") return await handleLogout(request, env);
@@ -77,18 +69,16 @@ export default {
         return await getAnalytics(user, url, env);
       }
 
-      return await env.ASSETS.fetch(request);
+      if (path === "/api/analytics/stages" && request.method === "GET") {
+        const user = await requireAuth(request, env);
+        if (!user) return unauthorized();
+        return await getStageAnalytics(user, url, env);
+      }
     } catch (err) {
-      // TEMPORARY: includes the real message + stack so we can pinpoint
-      // the fault. Safe to leave during setup; consider trimming later.
-      return json(
-        {
-          error: "Server error: " + (err && err.message ? err.message : String(err)),
-          stack: err && err.stack ? String(err.stack) : null,
-        },
-        500
-      );
+      return json({ error: "Server error: " + err.message }, 500);
     }
+
+    return env.ASSETS.fetch(request);
   },
 };
 
@@ -114,7 +104,7 @@ async function handleRegister(request, env) {
     .bind(id, email, hash, salt, now)
     .run();
 
-  return await startSession(id, email, env);
+  return startSession(id, email, env);
 }
 
 async function handleLogin(request, env) {
@@ -128,7 +118,7 @@ async function handleLogin(request, env) {
   const ok = await verifyPassword(password, user.salt, user.password_hash);
   if (!ok) return json({ error: "Invalid email or password" }, 401);
 
-  return await startSession(user.id, user.email, env);
+  return startSession(user.id, user.email, env);
 }
 
 async function handleLogout(request, env) {
@@ -160,7 +150,7 @@ async function startSession(userId, email, env) {
 }
 
 async function requireAuth(request, env) {
-  return await getSessionUser(request, env);
+  return getSessionUser(request, env);
 }
 
 async function getSessionUser(request, env) {
@@ -409,6 +399,47 @@ async function getAnalytics(user, url, env) {
       series,
     });
   }
+}
+
+async function getStageAnalytics(user, url, env) {
+  let months = parseInt(url.searchParams.get("months")) || 12;
+  if (![6, 12, 24].includes(months)) months = 12;
+
+  const { results } = await env.DB.prepare(
+    `SELECT strftime('%Y-%m', closed_at/1000, 'unixepoch') AS ym, stage,
+            COUNT(*) AS cnt, SUM(on_time) AS ontime
+     FROM rows WHERE user_id = ? AND status = 'COMPLETED' GROUP BY ym, stage`
+  )
+    .bind(user.id)
+    .all();
+
+  const map = {};
+  results.forEach((r) => {
+    if (!map[r.stage]) map[r.stage] = {};
+    map[r.stage][r.ym] = { cnt: r.cnt, ontime: r.ontime };
+  });
+
+  const now = new Date();
+  const keys = [];
+  const labels = [];
+  for (let i = months - 1; i >= 0; i--) {
+    const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1));
+    keys.push(`${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`);
+    labels.push(d.toLocaleString("en-US", { month: "short", year: "2-digit", timeZone: "UTC" }));
+  }
+
+  const STAGES = ["Indicative", "Detail Design", "Pricing", "Handover", "Redesign", "Repricing", "ECI", "Tender"];
+  const series = STAGES.map((stage) => {
+    const stageMap = map[stage] || {};
+    const points = keys.map((k) => {
+      const e = stageMap[k];
+      if (!e || !e.cnt) return null;
+      return Math.round((e.ontime / e.cnt) * 100);
+    });
+    return { stage, points };
+  });
+
+  return json({ months, labels, series });
 }
 
 /* ===========================================================
