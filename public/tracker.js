@@ -5,12 +5,29 @@
 const POLL_MS = 4000;
 const TICK_MS = 1000;
 const REMINDER_RATIO = 0.20;
+const REMINDER_COOLDOWN_MS = 12 * 60 * 60 * 1000; // 12 hours
+const REMINDER_LOG_KEY = "siteControlReminderLog_v1";
 
 let rows = [];
 let syncing = false;
-let remindedIds = new Set();
 let reminderQueue = [];
 let reminderShowing = false;
+
+function loadReminderLog() {
+  try {
+    return JSON.parse(localStorage.getItem(REMINDER_LOG_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+function saveReminderLog(log) {
+  try {
+    localStorage.setItem(REMINDER_LOG_KEY, JSON.stringify(log));
+  } catch {
+    /* storage unavailable — reminders just won't persist across reloads */
+  }
+}
+let reminderLog = loadReminderLog();
 
 async function fetchRows() {
   try {
@@ -65,7 +82,8 @@ async function updateRow(id, payload) {
     const updated = await apiPatch(`/api/rows/${id}`, { action: "update", ...payload });
     const row = rows.find((r) => r.id === id);
     if (row) Object.assign(row, updated);
-    remindedIds.delete(id); // stage/start-date may have changed the deadline — allow re-reminding
+    delete reminderLog[id]; // stage/start-date may have changed the deadline — allow re-reminding
+    saveReminderLog(reminderLog);
     renderTable();
   } catch (e) {
     showBanner(e.message);
@@ -92,7 +110,8 @@ async function deleteRow(id) {
   try {
     await apiDelete(`/api/rows/${id}`);
     rows = rows.filter((r) => r.id !== id);
-    remindedIds.delete(id);
+    delete reminderLog[id];
+    saveReminderLog(reminderLog);
     renderTable();
   } catch (e) {
     showBanner(e.message);
@@ -115,9 +134,13 @@ function checkReminders() {
     const remainSec = allocSec - net;
     const ratio = remainSec / allocSec;
 
-    if (remainSec > 0 && ratio <= REMINDER_RATIO && !remindedIds.has(row.id)) {
-      remindedIds.add(row.id);
-      queueReminder(row.address, remainSec);
+    if (remainSec > 0 && ratio <= REMINDER_RATIO) {
+      const last = reminderLog[row.id];
+      if (!last || Date.now() - last >= REMINDER_COOLDOWN_MS) {
+        reminderLog[row.id] = Date.now();
+        saveReminderLog(reminderLog);
+        queueReminder(row.address, remainSec);
+      }
     }
   });
 }
