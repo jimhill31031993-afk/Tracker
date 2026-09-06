@@ -231,6 +231,15 @@ function formatCurrency(n) {
   return "$" + Math.round(num).toLocaleString("en-US");
 }
 
+function formatISODate(ms) {
+  if (!ms) return "-";
+  const d = new Date(ms);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 function showBanner(msg) {
   let el = document.getElementById("errorBanner");
   if (!el) {
