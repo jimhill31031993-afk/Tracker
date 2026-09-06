@@ -43,7 +43,7 @@ function renderTable() {
       <td>${escapeHtml(row.wbs)}</td>
       <td>${stageBadge(row.stage)}</td>
       <td class="mono">${row.startDate || "-"}</td>
-      <td class="mono">${row.closedAt ? new Date(row.closedAt).toLocaleDateString() : "-"}</td>
+      <td class="mono">${formatISODate(row.closedAt)}</td>
       <td><span class="badge ${row.onTime ? "badge-good" : "badge-bad"}">${row.onTime ? "On time" : "Overdue"}</span></td>
       <td class="value-cell" data-id="${row.id}"></td>
       <td>
@@ -159,7 +159,7 @@ function openTimeBar(row) {
     <div class="timebar-line"><span>Spent time (running, excl. hold):</span><strong>${toDays(spentSec)} days</strong></div>
     <div class="timebar-line"><span>Hold time (total):</span><strong>${toDays(heldSec)} days</strong></div>
     <div class="timebar-line"><span>Start date:</span><strong>${row.startDate}</strong></div>
-    <div class="timebar-line"><span>Finished date:</span><strong>${row.closedAt ? new Date(row.closedAt).toLocaleDateString() : "-"}</strong></div>
+    <div class="timebar-line"><span>Finished date:</span><strong>${formatISODate(row.closedAt)}</strong></div>
     ${exceedSec > 0 ? `<div class="timebar-line timebar-line-exceed"><span>Exceeded allocation by:</span><strong>${toDays(exceedSec)} days</strong></div>` : ""}
   `;
 
