@@ -24,6 +24,7 @@
           <th class="col-date">Closed date</th>
           <th class="col-status">On time</th>
           <th class="col-value">Project value</th>
+          <th class="col-row-actions"></th>
         </tr>
       </thead>
       <tbody id="rowsBody"></tbody>
@@ -33,6 +34,20 @@
 </main>
 
 <footer id="footerRoot" class="site-footer"></footer>
+
+<!-- ===================== TIME BREAKDOWN POPUP ===================== -->
+<div id="modalTimeBar" class="modal-backdrop">
+  <div class="modal modal-wide">
+    <div class="modal-head">
+      <h2 id="timeBarTitle">Time Breakdown</h2>
+      <button class="modal-close" data-close="modalTimeBar">&times;</button>
+    </div>
+    <div class="timebar-body">
+      <div class="timebar-track-wrap" id="timebarTrack"></div>
+      <div class="timebar-lines" id="timebarLines"></div>
+    </div>
+  </div>
+</div>
 
 <script src="common.js"></script>
 <script src="completed.js"></script>
