@@ -13,6 +13,7 @@ const STAGE_DURATIONS = {
   "Repricing": 2,
   "ECI": 10,
   "Tender": 10,
+  "Variation": 5,
 };
 
 const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
@@ -428,7 +429,7 @@ async function getStageAnalytics(user, url, env) {
     labels.push(d.toLocaleString("en-US", { month: "short", year: "2-digit", timeZone: "UTC" }));
   }
 
-  const STAGES = ["Indicative", "Detail Design", "Pricing", "Handover", "Redesign", "Repricing", "ECI", "Tender"];
+  const STAGES = ["Indicative", "Detail Design", "Pricing", "Handover", "Redesign", "Repricing", "ECI", "Tender", "Variation"];
 
   const pointFor = (stage, key) => {
     const e = (map[stage] || {})[key];
