@@ -13,6 +13,7 @@ const STAGE_DURATIONS = {
   "Repricing": 2,
   "ECI": 10,
   "Tender": 10,
+  "Variation": 5,
 };
 
 /* Pastel badge colours for the Stage pill shown in tables */
@@ -26,6 +27,7 @@ const STAGE_COLORS = {
   "Repricing": { bg: "#DDE1E6", text: "#3F4750" },
   "ECI": { bg: "#F7CFE3", text: "#A31A62" },
   "Tender": { bg: "#DDD1F7", text: "#5B21B6" },
+  "Variation": { bg: "#EDD9C4", text: "#7A4A1E" },
 };
 
 /* Slightly more saturated versions, used for the Analytics line chart
@@ -39,6 +41,7 @@ const STAGE_LINE_COLORS = {
   "Repricing": "#9CA3AF",
   "ECI": "#DB2777",
   "Tender": "#7C3AED",
+  "Variation": "#92400E",
 };
 
 function stageBadge(stage) {
