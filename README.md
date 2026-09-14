@@ -99,4 +99,4 @@ means Step 1's schema wasn't run; a 500 error usually means the
   **Add Domain**, free, same as before.
 - **Changing stage durations:** edit `STAGE_DURATIONS` near the top of
   `public/app.js`, and update the matching option labels in
-  `public/index.html`.
+  `public/index.html`. 
