@@ -1,0 +1,39 @@
+PATCH FILE LIST — Communication Tracker Phase 1
+
+MODIFIED (existing files, additive lines only):
+  M public/common.js
+  M public/completed.html
+  M public/completed.js
+  M src/index.js
+
+NEW:
+  A CHANGELOG.md
+  A TEST_REPORT.md
+  A docs/COMMUNICATION_TRACKER.md
+  A docs/DEPLOY_AND_ROLLBACK.md
+  A docs/MAILBOX_APPROVAL.md
+  A public/comms-demo.js
+  A public/comms-logic.js
+  A public/comms-ui.js
+  A public/comms.css
+  A public/comms.html
+  A public/comms.js
+  A public/xlsx-writer.js
+  A schema_comms.sql
+  A src/comms.js
+  A tests/api.test.mjs
+  A tests/baseline-hashes.json
+  A tests/baseline/common.original.js
+  A tests/baseline/completed.original.html
+  A tests/baseline/completed.original.js
+  A tests/baseline/index.original.js
+  A tests/e2e/run.sh
+  A tests/e2e/server.mjs
+  A tests/e2e/ui.py
+  A tests/helpers/check_xlsx.py
+  A tests/helpers/d1.mjs
+  A tests/logic.test.mjs
+  A tests/regression.test.mjs
+  A tests/xlsx.test.mjs
+
+DELETED: none

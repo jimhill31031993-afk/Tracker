@@ -49,11 +49,15 @@ function renderTable() {
       <td>
         <div class="row-actions">
           <button class="icon-btn" data-action="timebar" title="Time breakdown">📊</button>
+          <button class="icon-btn" data-action="comms-history" title="View Communication History" aria-label="View Communication History">✉ History</button>
+          <button class="icon-btn" data-action="comms-excel" title="Download communication history as Excel" aria-label="Download communication history as Excel">⬇ Excel</button>
         </div>
       </td>
     `;
 
     tr.querySelector('[data-action="timebar"]').addEventListener("click", () => openTimeBar(row));
+    tr.querySelector('[data-action="comms-history"]').addEventListener("click", () => CommsUI.openHistoryForRow(row.id));
+    tr.querySelector('[data-action="comms-excel"]').addEventListener("click", () => CommsUI.downloadForRow(row.id));
 
     const valueCell = tr.querySelector(".value-cell");
     renderValueCell(valueCell, row);

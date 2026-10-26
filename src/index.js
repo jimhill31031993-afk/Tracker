@@ -3,6 +3,8 @@
 // row CRUD + close-to-completed flow, the completed list, analytics,
 // and serving the static site from ./public.
 
+import { handleComms } from "./comms.js"; // Communication Tracker (additive module)
+
 const STAGE_DURATIONS = {
   "Not Selected": 0,
   "Indicative": 5,
@@ -74,6 +76,13 @@ export default {
         const user = await requireAuth(request, env);
         if (!user) return unauthorized();
         return await getStageAnalytics(user, url, env);
+      }
+
+      // Communication Tracker — same session check as every other API route.
+      if (path.startsWith("/api/comms/")) {
+        const user = await requireAuth(request, env);
+        if (!user) return unauthorized();
+        return await handleComms(request, env, url, user);
       }
     } catch (err) {
       return json({ error: "Server error: " + err.message }, 500);
