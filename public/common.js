@@ -108,6 +108,15 @@ async function requireAuthOrRedirect() {
 /* ---------------------------------------------------------
    Header + footer
    --------------------------------------------------------- */
+/* Communication Tracker nav link: short label on narrow screens so the existing top bar never overflows. */
+(function () {
+  const st = document.createElement("style");
+  st.textContent =
+    "@media (max-width:520px){.topnav-link .ct-nav-full{display:none}}" +
+    "@media (min-width:521px){.topnav-link .ct-nav-short{display:none}}";
+  document.head.appendChild(st);
+})();
+
 function initHeaderFooter(activePage, user) {
   const headerRoot = document.getElementById("headerRoot");
   if (headerRoot) {
@@ -123,6 +132,7 @@ function initHeaderFooter(activePage, user) {
         <a href="index.html" class="topnav-link ${activePage === "tracker" ? "active" : ""}">Tracker</a>
         <a href="completed.html" class="topnav-link ${activePage === "completed" ? "active" : ""}">Completed</a>
         <a href="analytics.html" class="topnav-link ${activePage === "analytics" ? "active" : ""}">Analytics</a>
+        <a href="comms.html" class="topnav-link ${activePage === "comms" ? "active" : ""}" aria-label="Communication Tracker"><span class="ct-nav-full">Communication Tracker</span><span class="ct-nav-short">Comms</span></a>
       </nav>
       <div class="topbar-right">
         ${activePage === "tracker" ? `<button id="btnAddNew" class="btn btn-primary">+ Add new</button>` : ""}

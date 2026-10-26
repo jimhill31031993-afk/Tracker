@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Communication Tracker — Site Control</title>
+<link rel="icon" type="image/svg+xml" href="logo.svg">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="comms.css">
+</head>
+<body data-page="comms">
+
+<header class="topbar" id="headerRoot"></header>
+
+<main id="commsMain">
+  <section id="ctModeBanner" class="ct-banner ct-banner-mode" role="status" aria-live="polite"></section>
+
+  <div class="ct-toolbar" role="search" aria-label="Filter tasks">
+    <label class="ct-field ct-field-grow">Search
+      <input type="search" id="ctSearch" placeholder="Project, WBS, customer or Vector team…" autocomplete="off">
+    </label>
+    <label class="ct-field">Counterparty
+      <select id="ctFilterCp">
+        <option value="ALL">All</option>
+        <option value="CUSTOMER">Customer</option>
+        <option value="VECTOR_TEAM">Vector team</option>
+        <option value="OTHER">Other</option>
+        <option value="UNASSIGNED">Not set</option>
+      </select>
+    </label>
+    <label class="ct-field">Status
+      <select id="ctFilterStatus">
+        <option value="ALL">All</option>
+        <option value="RUNNING">Running</option>
+        <option value="HOLD">On hold</option>
+        <option value="NOT_STARTED">Not started</option>
+      </select>
+    </label>
+    <label class="ct-field">Due state
+      <select id="ctFilterDue">
+        <option value="ALL">All</option>
+        <option value="OVERDUE">Overdue</option>
+        <option value="DUE_SOON">Due soon</option>
+        <option value="ON_TRACK">On track</option>
+        <option value="NA">No countdown</option>
+      </select>
+    </label>
+    <label class="ct-field">Time zone
+      <input type="text" id="ctTz" list="ctTzList" autocomplete="off" spellcheck="false">
+      <datalist id="ctTzList"></datalist>
+    </label>
+  </div>
+
+  <div class="ct-controls">
+    <button type="button" id="ctPauseBtn" class="btn btn-ghost" aria-pressed="false">⏸ Stop reminders</button>
+    <button type="button" id="ctCentreBtn" class="btn btn-ghost" aria-expanded="false" aria-controls="ctCentre">🔔 Reminder centre <span id="ctCentreCount" class="ct-count">0</span></button>
+    <button type="button" id="ctDemoBtn" class="btn btn-ghost" aria-pressed="false">Preview demo data</button>
+    <span id="ctPauseNote" class="ct-pause-note" hidden>Reminder pop-ups are paused. Tracking and history collection continue.</span>
+  </div>
+
+  <section id="ctCentre" class="ct-centre" hidden aria-label="Reminder centre"></section>
+
+  <div id="ctState" class="ct-state" role="status" aria-live="polite"></div>
+  <div id="ctBoard"></div>
+</main>
+
+<footer id="footerRoot" class="site-footer"></footer>
+
+<!-- Pop-up reminders (two visual types) -->
+<div id="ctPopups" class="ct-popups" role="region" aria-label="Reminders"></div>
+
+<!-- ============ RECORD EVENT (manual) ============ -->
+<div id="modalCtEvent" class="modal-backdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ctEventTitle">
+    <div class="modal-head">
+      <h2 id="ctEventTitle">Record a message</h2>
+      <button type="button" class="modal-close" data-close="modalCtEvent" aria-label="Close">&times;</button>
+    </div>
+    <form id="formCtEvent" novalidate>
+      <p class="modal-note" id="ctEventNote"></p>
+      <input type="hidden" id="ctEvRow">
+      <label>Direction
+        <select id="ctEvDirection">
+          <option value="IN">Received (incoming)</option>
+          <option value="OUT">Sent (outgoing)</option>
+        </select>
+      </label>
+      <label>Date and time (<span id="ctEvTzLabel"></span>)
+        <input type="datetime-local" id="ctEvWhen" required>
+        <span class="ct-hint" id="ctEvWhenHint" role="status" aria-live="polite"></span>
+      </label>
+      <label><span id="ctEvAddrLabel">Sender email</span>
+        <input type="email" id="ctEvAddr" required maxlength="254" placeholder="name@example.com" autocomplete="off">
+      </label>
+      <label id="ctEvReplyWrap" hidden>This sent message is a reply to
+        <select id="ctEvReply"></select>
+      </label>
+      <label>Summary (optional, exactly 5–9 words)
+        <input type="text" id="ctEvSummary" maxlength="140" autocomplete="off">
+        <span class="ct-hint" id="ctEvWords">0 words — leave blank if you don’t want a note</span>
+      </label>
+      <label>Conversation / project reference (optional)
+        <input type="text" id="ctEvThread" maxlength="120" autocomplete="off">
+      </label>
+      <p class="ct-form-error" id="ctEvError" role="alert"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close="modalCtEvent">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save entry</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ COUNTERPARTY ============ -->
+<div id="modalCtCp" class="modal-backdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ctCpTitle">
+    <div class="modal-head">
+      <h2 id="ctCpTitle">Set counterparty</h2>
+      <button type="button" class="modal-close" data-close="modalCtCp" aria-label="Close">&times;</button>
+    </div>
+    <form id="formCtCp" novalidate>
+      <p class="modal-note">Who do you correspond with about this task? Tasks with the same counterparty share one weekly update reminder.</p>
+      <input type="hidden" id="ctCpRow">
+      <label>Counterparty type
+        <select id="ctCpType">
+          <option value="CUSTOMER">Customer</option>
+          <option value="VECTOR_TEAM">Vector team</option>
+          <option value="OTHER">Other</option>
+        </select>
+      </label>
+      <label>Name
+        <input type="text" id="ctCpName" required maxlength="120" autocomplete="off" placeholder="e.g. the customer or team name">
+      </label>
+      <label>Tracking start (optional)
+        <input type="datetime-local" id="ctCpStart">
+        <span class="ct-hint">Used for the weekly reminder only when no sent message has been recorded for this counterparty. Defaults to now.</span>
+      </label>
+      <p class="ct-form-error" id="ctCpError" role="alert"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close="modalCtCp">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script src="comms-logic.js"></script>
+<script src="xlsx-writer.js"></script>
+<script src="comms-demo.js"></script>
+<script src="comms-ui.js"></script>
+<script src="comms.js"></script>
+</body>
+</html>
